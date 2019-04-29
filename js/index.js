@@ -2,6 +2,7 @@
 
 (function() {
   let data = 'no data';
+  // let filteredData = '';
   let svgContainer = ''; // keep SVG reference in global scope
 
   // load data and make scatter plot after window loads
@@ -18,7 +19,7 @@
   // make scatter plot with trend line
   function makeScatterPlot(csvData) {
     data = csvData; // assign data as global variable
-    console.log(data);
+
     // get arrays of fertility rate data and life Expectancy data
     let fertility_rate_data = data.map(row =>
       parseFloat(row['fertility_rate'])
@@ -37,7 +38,7 @@
       'life_expectancy'
     );
 
-    makeDropdown();
+    makeDropdown(mapFunctions);
 
     // plot data as points and add tooltip functionality
     plotData(mapFunctions);
@@ -70,7 +71,7 @@
   }
 
   // create dropdown
-  function makeDropdown() {
+  function makeDropdown(mapFunctions) {
     const dropdownYears = [...new Set(data.map(location => location.time))];
 
     let dropDown = d3
@@ -78,18 +79,41 @@
       .append('select')
       .attr('name', 'country-list');
 
-    let options = dropDown
+    let dropDownOptions = dropDown
       .selectAll('option')
       .data(dropdownYears)
       .enter()
       .append('option');
 
-    options.text(d => d).attr('value', d => d);
+    dropDownOptions.text(d => d).attr('value', d => d);
+
+    dropDown.on('change', function() {
+      var selectedTime = this.value;
+
+      svgContainer
+        .selectAll('.circles')
+        .filter(d => selectedTime !== d.time)
+        .attr('display', 'none');
+
+      svgContainer
+        .selectAll('.circles')
+        .filter(d => selectedTime === d.time)
+        .attr('display', 'block');
+
+      // filteredData = data.filter(location => {
+      //   return location.time === selected;
+      // });
+
+      // plotData(mapFunctions);
+
+      // console.log(data);
+    });
   }
 
   // plot all the data points on the SVG
   // and add tooltip functionality
   function plotData(map) {
+    // data = data.filter(location => location.time === '1960');
     // get population data as array
     let pop_data = data.map(row => +row['pop_mlns']);
     let pop_limits = d3.extent(pop_data);
@@ -116,6 +140,7 @@
       .data(data)
       .enter()
       .append('circle')
+      .attr('class', 'circles')
       .attr('cx', xMap)
       .attr('cy', yMap)
       .attr('r', d => pop_map_func(d['pop_mlns']))
