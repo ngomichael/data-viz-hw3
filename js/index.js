@@ -38,10 +38,13 @@
       'life_expectancy'
     );
 
-    makeDropdown(mapFunctions);
+    makeDropdown();
 
     // plot data as points and add tooltip functionality
     plotData(mapFunctions);
+
+    // show and hide data points starting with 1960
+    showHidePoints();
 
     // draw title and axes labels
     makeLabels();
@@ -71,7 +74,7 @@
   }
 
   // create dropdown
-  function makeDropdown(mapFunctions) {
+  function makeDropdown() {
     const dropdownYears = [...new Set(data.map(location => location.time))];
 
     let dropDown = d3
@@ -88,26 +91,22 @@
     dropDownOptions.text(d => d).attr('value', d => d);
 
     dropDown.on('change', function() {
-      var selectedTime = this.value;
-
-      svgContainer
-        .selectAll('.circles')
-        .filter(d => selectedTime !== d.time)
-        .attr('display', 'none');
-
-      svgContainer
-        .selectAll('.circles')
-        .filter(d => selectedTime === d.time)
-        .attr('display', 'block');
-
-      // filteredData = data.filter(location => {
-      //   return location.time === selected;
-      // });
-
-      // plotData(mapFunctions);
-
-      // console.log(data);
+      var selectedYear = this.value;
+      showHidePoints(selectedYear);
     });
+  }
+
+  // hides and shows data points based off of selected year
+  function showHidePoints(selectedYear = '1960') {
+    svgContainer
+      .selectAll('.circles')
+      .filter(d => selectedYear !== d.time)
+      .attr('display', 'none');
+
+    svgContainer
+      .selectAll('.circles')
+      .filter(d => selectedYear === d.time)
+      .attr('display', 'inline');
   }
 
   // plot all the data points on the SVG
