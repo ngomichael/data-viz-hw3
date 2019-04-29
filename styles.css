@@ -1,0 +1,49 @@
+* {
+  position: relative;
+  font-family: 'Open Sans', sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+}
+
+#yAxislabelAndHistogramContainer {
+  display: flex;
+  align-items: center;
+}
+
+#xAxislabelAndHistogramContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#myCanvas {
+  max-width: 500px;
+  max-height: 500px;
+}
+
+#title {
+  font-size: 25px;
+  font-weight: 100;
+  color: hsl(228, 21%, 31%);
+  margin-right: 250px;
+}
+
+.axisLabel {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+#xAxisLabel {
+  bottom: 20px;
+  left: 55px;
+}
+
+#yAxisLabel {
+  transform: rotate(-90deg);
+  left: 55px;
+}
