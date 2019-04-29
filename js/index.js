@@ -12,13 +12,13 @@
       .attr('width', 500)
       .attr('height', 500);
     // d3.csv is basically fetch but it can be be passed a csv file as a parameter
-    d3.csv('./data/data.csv').then(data => makeScatterPlot(data));
+    d3.csv('./data/dataEveryYear.csv').then(data => makeScatterPlot(data));
   };
 
   // make scatter plot with trend line
   function makeScatterPlot(csvData) {
     data = csvData; // assign data as global variable
-
+    console.log(data);
     // get arrays of fertility rate data and life Expectancy data
     let fertility_rate_data = data.map(row =>
       parseFloat(row['fertility_rate'])
@@ -71,6 +71,8 @@
 
   // create dropdown
   function makeDropdown() {
+    const dropdownYears = [...new Set(data.map(location => location.time))];
+
     let dropDown = d3
       .select('#filter')
       .append('select')
@@ -78,11 +80,11 @@
 
     let options = dropDown
       .selectAll('option')
-      .data(data)
+      .data(dropdownYears)
       .enter()
       .append('option');
 
-    options.text(d => d.location).attr('value', d => d.location);
+    options.text(d => d).attr('value', d => d);
   }
 
   // plot all the data points on the SVG
