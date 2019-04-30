@@ -2,7 +2,6 @@
 
 (function() {
   let data = 'no data';
-  // let filteredData = '';
   let svgContainer = ''; // keep SVG reference in global scope
 
   // load data and make scatter plot after window loads
@@ -19,25 +18,26 @@
   // make scatter plot with trend line
   function makeScatterPlot(csvData) {
     data = csvData; // assign data as global variable
-    console.log(data);
+
     // get arrays of fertility rate data and life Expectancy data
-    let fertility_rate_data = data.map(row =>
+    const fertility_rate_data = data.map(row =>
       parseFloat(row['fertility_rate'])
     );
-    let life_expectancy_data = data.map(row =>
+    const life_expectancy_data = data.map(row =>
       parseFloat(row['life_expectancy'])
     );
 
     // find data limits
-    let axesLimits = findMinMax(fertility_rate_data, life_expectancy_data);
+    const axesLimits = findMinMax(fertility_rate_data, life_expectancy_data);
 
     // draw axes and return scaling + mapping functions
-    let mapFunctions = drawAxes(
+    const mapFunctions = drawAxes(
       axesLimits,
       'fertility_rate',
       'life_expectancy'
     );
 
+    // creates dropdown of different years
     makeDropdown();
 
     // plot data as points and add tooltip functionality
@@ -73,31 +73,34 @@
       .text('Life Expectancy (years)');
   }
 
-  // create dropdown
+  // create dropdown to filter data points
   function makeDropdown() {
+    // get all unique years to include in dropdown
     const dropdownYears = [...new Set(data.map(location => location.time))];
 
-    let dropdown = d3
+    // create select element and add an on change event handler to show and hide points
+    const dropdown = d3
       .select('#filter')
       .append('select')
-      .attr('name', 'country-list');
+      .attr('name', 'country-list')
+      .on('change', function() {
+        var selectedYear = this.value;
+        showHidePoints(selectedYear);
+      });
 
-    let dropdownOptions = dropdown
+    // add dropdown options with the year as text
+    dropdown
       .selectAll('option')
       .data(dropdownYears)
       .enter()
-      .append('option');
-
-    dropdownOptions.text(d => d).attr('value', d => d);
-
-    dropdown.on('change', function() {
-      var selectedYear = this.value;
-      showHidePoints(selectedYear);
-    });
+      .append('option')
+      .text(d => d)
+      .attr('value', d => d);
 
     const prevButton = document.getElementById('prev');
     const nextButton = document.getElementById('next');
 
+    // add click event listener to update dropdown value and filter data points by previous year
     prevButton.addEventListener('click', e => {
       const select = document.getElementsByTagName('select')[0];
       if (select.selectedIndex > 0) {
@@ -106,6 +109,7 @@
       }
     });
 
+    // add click event listener to update dropdown value and filter data points by next year
     nextButton.addEventListener('click', e => {
       const select = document.getElementsByTagName('select')[0];
       select.selectedIndex++;
@@ -131,20 +135,21 @@
   function plotData(map) {
     // data = data.filter(location => location.time === '1960');
     // get population data as array
-    let pop_data = data.map(row => +row['pop_mlns']);
-    let pop_limits = d3.extent(pop_data);
+    const pop_data = data.map(row => +row['pop_mlns']);
+    const pop_limits = d3.extent(pop_data);
+
     // make size scaling function for population
-    let pop_map_func = d3
+    const pop_map_func = d3
       .scaleLinear()
       .domain([pop_limits[0], pop_limits[1]])
       .range([3, 20]);
 
     // mapping functions
-    let xMap = map.x;
-    let yMap = map.y;
+    const xMap = map.x;
+    const yMap = map.y;
 
     // make tooltip
-    let div = d3
+    const tooltip = d3
       .select('body')
       .append('div')
       .attr('class', 'tooltip')
@@ -161,13 +166,14 @@
       .attr('cy', yMap)
       .attr('r', d => pop_map_func(d['pop_mlns']))
       .attr('fill', '#4286f4')
+
       // add tooltip functionality to points
       .on('mouseover', d => {
-        div
+        tooltip
           .transition()
           .duration(200)
           .style('opacity', 0.9);
-        div
+        tooltip
           .html(
             d.location +
               '<br/>' +
@@ -175,19 +181,19 @@
               numberWithCommas(d['pop_mlns'] * 1000000) +
               '<br/>' +
               'year: ' +
-              numberWithCommas(d['time']) +
+              d['time'] +
               '<br/>' +
               'life expectancy: ' +
-              numberWithCommas(d['life_expectancy']) +
+              d['life_expectancy'] +
               '<br/>' +
               'fertility_rate: ' +
-              numberWithCommas(d['fertility_rate'])
+              d['fertility_rate']
           )
           .style('left', d3.event.pageX + 5 + 'px')
           .style('top', d3.event.pageY + 10 + 'px');
       })
       .on('mouseout', d => {
-        div
+        tooltip
           .transition()
           .duration(500)
           .style('opacity', 0);
@@ -197,46 +203,46 @@
   // draw the axes and ticks
   function drawAxes(limits, x, y) {
     // return x value from a row of data
-    let xValue = function(d) {
+    const xValue = function(d) {
       return +d[x];
     };
 
     // function to scale x value
-    let xScale = d3
+    const xScale = d3
       .scaleLinear()
       .domain([limits.xMin - 0.5, limits.xMax + 0.5]) // give domain buffer room
       .range([50, 450]);
 
     // xMap returns a scaled x value from a row of data
-    let xMap = function(d) {
+    const xMap = function(d) {
       return xScale(xValue(d));
     };
 
     // plot x-axis at bottom of SVG
-    let xAxis = d3.axisBottom().scale(xScale);
+    const xAxis = d3.axisBottom().scale(xScale);
     svgContainer
       .append('g')
       .attr('transform', 'translate(0, 450)')
       .call(xAxis);
 
     // return y value from a row of data
-    let yValue = function(d) {
+    const yValue = function(d) {
       return +d[y];
     };
 
     // function to scale y
-    let yScale = d3
+    const yScale = d3
       .scaleLinear()
       .domain([limits.yMax + 5, limits.yMin - 5]) // give domain buffer
       .range([50, 450]);
 
     // yMap returns a scaled y value from a row of data
-    let yMap = function(d) {
+    const yMap = function(d) {
       return yScale(yValue(d));
     };
 
     // plot y-axis at the left of SVG
-    let yAxis = d3.axisLeft().scale(yScale);
+    const yAxis = d3.axisLeft().scale(yScale);
     svgContainer
       .append('g')
       .attr('transform', 'translate(50, 0)')
@@ -254,12 +260,12 @@
   // find min and max for arrays of x and y
   function findMinMax(x, y) {
     // get min/max x values
-    let xMin = d3.min(x);
-    let xMax = d3.max(x);
+    const xMin = d3.min(x);
+    const xMax = d3.max(x);
 
     // get min/max y values
-    let yMin = d3.min(y);
-    let yMax = d3.max(y);
+    const yMin = d3.min(y);
+    const yMax = d3.max(y);
 
     // return formatted min/max data as an object
     return {
