@@ -77,22 +77,39 @@
   function makeDropdown() {
     const dropdownYears = [...new Set(data.map(location => location.time))];
 
-    let dropDown = d3
+    let dropdown = d3
       .select('#filter')
       .append('select')
       .attr('name', 'country-list');
 
-    let dropDownOptions = dropDown
+    let dropdownOptions = dropdown
       .selectAll('option')
       .data(dropdownYears)
       .enter()
       .append('option');
 
-    dropDownOptions.text(d => d).attr('value', d => d);
+    dropdownOptions.text(d => d).attr('value', d => d);
 
-    dropDown.on('change', function() {
+    dropdown.on('change', function() {
       var selectedYear = this.value;
       showHidePoints(selectedYear);
+    });
+
+    const prevButton = document.getElementById('prev');
+    const nextButton = document.getElementById('next');
+
+    prevButton.addEventListener('click', e => {
+      const select = document.getElementsByTagName('select')[0];
+      if (select.selectedIndex > 0) {
+        select.selectedIndex--;
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+
+    nextButton.addEventListener('click', e => {
+      const select = document.getElementsByTagName('select')[0];
+      select.selectedIndex++;
+      select.dispatchEvent(new Event('change'));
     });
   }
 
