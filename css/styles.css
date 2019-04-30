@@ -23,9 +23,12 @@ path {
 
 div.tooltip {
   position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  width: 120px;
-  height: 28px;
+  width: 140px;
+  height: 100px;
   padding: 2px;
   font: 12px sans-serif;
   background: lightsteelblue;

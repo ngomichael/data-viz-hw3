@@ -19,7 +19,7 @@
   // make scatter plot with trend line
   function makeScatterPlot(csvData) {
     data = csvData; // assign data as global variable
-
+    console.log(data);
     // get arrays of fertility rate data and life Expectancy data
     let fertility_rate_data = data.map(row =>
       parseFloat(row['fertility_rate'])
@@ -169,10 +169,22 @@
           .style('opacity', 0.9);
         div
           .html(
-            d.location + '<br/>' + numberWithCommas(d['pop_mlns'] * 1000000)
+            d.location +
+              '<br/>' +
+              'population: ' +
+              numberWithCommas(d['pop_mlns'] * 1000000) +
+              '<br/>' +
+              'year: ' +
+              numberWithCommas(d['time']) +
+              '<br/>' +
+              'life expectancy: ' +
+              numberWithCommas(d['life_expectancy']) +
+              '<br/>' +
+              'fertility_rate: ' +
+              numberWithCommas(d['fertility_rate'])
           )
-          .style('left', d3.event.pageX + 'px')
-          .style('top', d3.event.pageY - 28 + 'px');
+          .style('left', d3.event.pageX + 5 + 'px')
+          .style('top', d3.event.pageY + 10 + 'px');
       })
       .on('mouseout', d => {
         div
