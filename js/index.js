@@ -44,7 +44,7 @@
     plotData(mapFunctions);
 
     // show and hide data points starting with 1960
-    showHidePoints();
+    filterPoints();
 
     // draw title and axes labels
     makeLabels();
@@ -85,7 +85,7 @@
       .attr('name', 'country-list')
       .on('change', function() {
         var selectedYear = this.value;
-        showHidePoints(selectedYear);
+        filterPoints(selectedYear);
       });
 
     // add dropdown options with the year as text
@@ -121,7 +121,7 @@
   }
 
   // hides and shows data points based off of selected year
-  function showHidePoints(selectedYear = '1960') {
+  function filterPoints(selectedYear = '1960') {
     svgContainer
       .selectAll('.circles')
       .filter(d => selectedYear !== d.time)
