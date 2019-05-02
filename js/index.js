@@ -101,7 +101,7 @@
     const nextButton = document.getElementById('next');
 
     // add click event listener to update dropdown value and filter data points by previous year
-    prevButton.addEventListener('click', e => {
+    prevButton.addEventListener('click', () => {
       const select = document.getElementsByTagName('select')[0];
       if (select.selectedIndex > 0) {
         select.selectedIndex--;
@@ -110,10 +110,13 @@
     });
 
     // add click event listener to update dropdown value and filter data points by next year
-    nextButton.addEventListener('click', e => {
+    nextButton.addEventListener('click', () => {
       const select = document.getElementsByTagName('select')[0];
-      select.selectedIndex++;
-      select.dispatchEvent(new Event('change'));
+
+      if (select.selectedIndex !== dropdownYears.length - 1) {
+        select.selectedIndex++;
+        select.dispatchEvent(new Event('change'));
+      }
     });
   }
 
